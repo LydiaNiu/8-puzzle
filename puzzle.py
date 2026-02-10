@@ -323,7 +323,7 @@ def main():
     print("1. Easy (1 move)")
     print("2. Medium (2 moves)")
     print("3. Hard (3 moves)")
-    print("4. Very Hard (9 moves)")
+    print("4. Very Hard (8 moves)")
     print("5. Custom puzzle")
     
     choice = input("\nEnter your choice (1-5): ").strip()
