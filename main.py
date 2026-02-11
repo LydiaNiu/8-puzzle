@@ -7,8 +7,8 @@ Algorithms:
 
 """
 
-import heapq          # for priority queue (frontier)
-import copy           # for deepcopy of puzzle states
+import heapq # for priority queue (frontier)
+import copy # for deepcopy of puzzle states
 
 
 class TreeNode:
@@ -18,10 +18,10 @@ class TreeNode:
     """
 
     def __init__(self, parent, state, g_cost, h_cost):
-        self.parent = parent      # Parent TreeNode
-        self.state = state        # Puzzle configuration (2D list)
-        self.g = g_cost           # Path cost so far
-        self.h = h_cost           # Heuristic cost
+        self.parent = parent # Parent TreeNode
+        self.state = state  # Puzzle configuration (2D list)
+        self.g = g_cost # Depth cost (g(n))
+        self.h = h_cost # Heuristic cost (h(n))
 
     def f(self):
         """Total estimated cost f(n) = g(n) + h(n)"""
@@ -37,8 +37,10 @@ class TreeNode:
 
 def general_search(initial_state, heuristic_function):
     """
-    General search framework used by all algorithms.
-    heuristic_function determines the algorithm behavior.
+    This function serves as a general search framework used by all algorithms.
+    the parameter heuristic_func determines the algorithm behavior.
+
+    Note: Uniform cost search has no heuristic function, h(n) = 0
     """
 
     # Priority queue (frontier)
@@ -46,7 +48,8 @@ def general_search(initial_state, heuristic_function):
 
     # Create initial node
     start_node = TreeNode(None, initial_state, 0, 0)
-
+    print("\nInitial State:", start_node.state)
+    
     # Push node into heap-based priority queue
     heapq.heappush(frontier, start_node)
 
@@ -62,24 +65,17 @@ def general_search(initial_state, heuristic_function):
 # 3 Algorithms
 
 def uniform_cost_search(initial_state):
-    """
-    Uniform Cost Search.
-    Equivalent to A* with heuristic = 0.
-    """
+    print("Running Uniform Cost Search...")
     general_search(initial_state, heuristic_function=None)
 
 
 def a_star_misplaced_tile(initial_state):
-    """
-    A* Search using Misplaced Tile heuristic.
-    """
+    print("Running A* with Misplaced Tile Heuristic...")
     general_search(initial_state, heuristic_function=misplaced_tile_heuristic)
 
 
 def a_star_manhattan_distance(initial_state):
-    """
-    A* Search using Manhattan Distance heuristic.
-    """
+    print("Running A* with Manhattan Distance Heuristic...")
     general_search(initial_state, heuristic_function=manhattan_distance_heuristic)
 
 
@@ -101,6 +97,7 @@ def expand(node):
     return children
 
 
+#done
 def is_goal(goal, current):
     # This function checks whether the given state matches the goal configuration.
     #use a for loop to compare each element of the current state with goal state.
@@ -119,7 +116,17 @@ def board_to_tuple(state):
 
 
 # Heuristic Functions
+'''
+following are the heuristic functions for the A* search algorithms. 
 
+The first one counts the number of misplaced tiles. 
+The second one calculates the sum of Manhattan distances of the tiles from their goal positions.
+
+Both functions ignore the blank tile (0) when calculating their respective heuristics.
+Both functions return the heuristic value, which is used in the A* search to estimate the cost to reach the goal state from the current state.
+'''
+
+#done
 def misplaced_tile_heuristic(state):
     # Counts the number of misplaced tiles (excluding blank).
     misplace_tile = 0
@@ -128,9 +135,9 @@ def misplaced_tile_heuristic(state):
             misplace_tile += 1
     return misplace_tile
 
-
+#done
 def find_man_dist(tile_value, current_pos, distance):
-    # Helper function to calculate Manhattan distance for a single tile.
+    # Helper function to calculate Manhattan distance for one single tile.
     # Calculate the row and column of the current position and goal position.
     goal_pos = tile_value - 1  # since tile values are 1-8, their goal positions are 0-7
     current_row, current_col = divmod(current_pos, 3)
@@ -140,6 +147,7 @@ def find_man_dist(tile_value, current_pos, distance):
     # The formula is from the youtube video, "Manhattan | Algorithm | Simple Python Tutorial"
     return abs(current_row - goal_row) + abs(current_col - goal_col) 
 
+#done
 def manhattan_distance_heuristic(state):
     # Computes the sum of Manhattan distances of tiles from their goal positions.
     distance = 0
@@ -181,7 +189,7 @@ def reconstruct_path(goal_node):
     """
     pass
 
-
+#done
 def print_current_state(state):
     print("\nCurrent State:")
     for i in range(3):
@@ -199,6 +207,7 @@ def main():
         print("\nPlease select the difficulty level:")
         print("1. Easy\n2. Medium\n3. Hard")
         difficulty_choice = input("Enter choice (1/2/3): ")
+        
         if difficulty_choice == '1':
             initial_state = [1,2,3,4,5,6,0,7,8]
         elif difficulty_choice == '2':
