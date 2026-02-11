@@ -1,4 +1,5 @@
-1. I am having questions on the pipeline, 
+1. idk how to test the codes
+hwo does the queueing works in pq? 
 2. how do the expanded children of the current node append into the pq by the priority? 
 3. how to avoid going back to the parent state when expanding children state
 

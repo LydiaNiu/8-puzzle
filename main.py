@@ -26,8 +26,8 @@ class TreeNode:
     def f(self):
         return self.g + self.h
 
-    # This function lets heapq to compare nodes based on their f(n) values.
-    def Compare_cost(self, other):
+    # less than operator is used by heapq to maintain the priority queue order.
+    def __lt__(self, other):
         return self.f() < other.f()
 
 
@@ -43,7 +43,7 @@ def general_search(initial_state, heuristic_function):
     # The following codes are from the pseudocode of general search provided in project description
     
     # Priority queue (frontier)
-    frontier = []
+    pq = []
 
     # Create initial node / MAKE_NODE in the pseudocode
     start_node = TreeNode(None, initial_state, 0, 0) # The root of the tree, no parents, g and f both =0
@@ -51,35 +51,39 @@ def general_search(initial_state, heuristic_function):
     
     # Push node into heap-based priority queue / MODE_QUEUE in the pseudocode
     # The heapq = frontier control 
-    heapq.heappush(frontier, start_node)
+    heapq.heappush(pq, start_node)
 
     # Main loop 
-    while frontier:
+    while pq:
         # Pop thenode with smallest priority value
-        current_node = heapq.heappop(frontier)
+        current_node = heapq.heappop(pq)
         
-        # check if the current node is the goal state, if so, return the node
+        # Goal test: check if the current node's state is the goal state, if so, return the node
         if is_goal(goal, current_node.state):
             print("Goal state reached!")
             return current_node
         else:
-            # first find the children of the current node by calling the expand function
-            children = expand(current_node)
-            # question: append based on priority value, do we re-sort the order of the children?
+            # expansion
             
-            # calculate the heuristic value for each child node using the provided heuristic function, and update their g and h values accordingly
-            # question: how to calculate the h(n) without calling the algorithm again?
+            # 1. find the children of the current node by calling the expand function
+            children = expand(current_node)
+            
+            # 2. calculate the f(n) values for each child node
+            # update their g and h values accordingly
+            child.g = current_node.g + 1 # increase 1 in every expansion
+            # question: 
             for child in children:
-                child.g = current_node.g + 1 # assuming each move has a cost of 1
                 if heuristic_function is not None:
                     child.h = heuristic_function(child.state)
                 else:
                     child.h = 0 # for uniform cost search, h(n) = 0
-            # append the expanded children of the current node into the priority queue
-            heapq.heappush(frontier, children)
+                child.f = child.g + child.h # calculate f(n) for each child node
             
-
-        # Goal test, expansion, and bookkeeping go here
+            # sort the children based on their f(n) values before pushing them into the priority queue
+            children.sort(key=lambda x: x.f())  
+            # append the expanded children of the current node into the priority queue
+            for child in children:
+                heapq.heappush(pq, child) # the heappush function will rearrange the list with priority
         pass
 
 
@@ -100,23 +104,6 @@ def a_star_manhattan_distance(initial_state):
     general_search(initial_state, heuristic_function=manhattan_distance_heuristic)
 
 
-# Expansion and State Logic
-
-def expand(node):
-    """
-    Generate all valid child nodes from the given node.
-    Uses deepcopy to avoid modifying parent state.
-    """
-    children = []
-
-    # Example usage of deepcopy (no real move logic)
-    new_state = copy.deepcopy(node.state)
-
-    # Placeholder for move generation
-    pass
-
-    return children
-
 
 #done
 def is_goal(goal, current):
@@ -128,12 +115,9 @@ def is_goal(goal, current):
     return True
 
 
-def board_to_tuple(state):
-    """
-    Convert a 2D puzzle state into a tuple for hashing.
-    Used for visited-state tracking.
-    """
-    pass
+# def to_tuple(node):
+#     # Convert a node into a tuple for hashing.
+#     return tuple(node.f(node), node.state)
 
 
 # Heuristic Functions
@@ -186,14 +170,11 @@ def manhattan_distance_heuristic(state):
 
 # Utility Functions (Operators)
 
-
+# TODO
 def get_blank_position(state):
-    """
-    Locate the position of the blank tile (0).
-    """
-    pass
+    return state.index('0') # find the index of the blank tile (0) in the current state
 
-
+# TODO
 def swap_tiles(state, pos1, pos2):
     """
     Swap two positions in the puzzle and return a new state.
@@ -203,7 +184,24 @@ def swap_tiles(state, pos1, pos2):
     pass
     return new_state
 
+# Expansion
+# TODO
+def expand(node):
+    """
+    Generate all valid child nodes from the given node.
+    Uses deepcopy to avoid modifying parent state.
+    """
+    children = []
 
+    # Example usage of deepcopy (no real move logic)
+    new_state = copy.deepcopy(node.state)
+
+    # Placeholder for move generation
+    pass
+
+    return children
+
+# TODO
 def reconstruct_path(goal_node):
     """
     Reconstruct solution path from goal node to root.
@@ -254,6 +252,8 @@ def main():
     elif alg_choice == '3':        
         a_star_manhattan_distance(initial_state)
     
+    # TODO: After the search is complete, reconstruct the path from the goal node 
+    # to the root node and print the statistics (number of nodes expanded, depth of solution).
     pass
 
 
