@@ -34,26 +34,50 @@ class TreeNode:
 def general_search(initial_state, heuristic_function):
     """
     This function serves as a general search framework used by all algorithms.
-    the parameter heuristic_func determines the algorithm behavior.
-
-    Note: Uniform cost search has no heuristic function, h(n) = 0
+    
+    the heuristic_function determines the algorithm's behavior.
+    the parameter is a function, which is called when re-calculate the h(n) for the children nodes
+    Note: Uniform cost search has no heuristic function, the paramenter passses in 'None', h(n) = 0
     """
+    
+    # The following codes are from the pseudocode of general search provided in project description
     
     # Priority queue (frontier)
     frontier = []
 
-    # Create initial node
-    start_node = TreeNode(None, initial_state, 0, 0)
+    # Create initial node / MAKE_NODE in the pseudocode
+    start_node = TreeNode(None, initial_state, 0, 0) # The root of the tree, no parents, g and f both =0
     print("\nInitial State:", start_node.state)
     
-    # Push node into heap-based priority queue
+    # Push node into heap-based priority queue / MODE_QUEUE in the pseudocode
     # The heapq = frontier control 
     heapq.heappush(frontier, start_node)
 
     # Main loop 
     while frontier:
-        # Pop node with smallest priority value
+        # Pop thenode with smallest priority value
         current_node = heapq.heappop(frontier)
+        
+        # check if the current node is the goal state, if so, return the node
+        if is_goal(goal, current_node.state):
+            print("Goal state reached!")
+            return current_node
+        else:
+            # first find the children of the current node by calling the expand function
+            children = expand(current_node)
+            # question: append based on priority value, do we re-sort the order of the children?
+            
+            # calculate the heuristic value for each child node using the provided heuristic function, and update their g and h values accordingly
+            # question: how to calculate the h(n) without calling the algorithm again?
+            for child in children:
+                child.g = current_node.g + 1 # assuming each move has a cost of 1
+                if heuristic_function is not None:
+                    child.h = heuristic_function(child.state)
+                else:
+                    child.h = 0 # for uniform cost search, h(n) = 0
+            # append the expanded children of the current node into the priority queue
+            heapq.heappush(frontier, children)
+            
 
         # Goal test, expansion, and bookkeeping go here
         pass
