@@ -42,7 +42,7 @@ def general_search(initial_state, heuristic_function):
 
     Note: Uniform cost search has no heuristic function, h(n) = 0
     """
-
+    
     # Priority queue (frontier)
     frontier = []
 
@@ -53,7 +53,7 @@ def general_search(initial_state, heuristic_function):
     # Push node into heap-based priority queue
     heapq.heappush(frontier, start_node)
 
-    # Main loop placeholder
+    # Main loop 
     while frontier:
         # Pop node with smallest priority value
         current_node = heapq.heappop(frontier)
@@ -163,7 +163,7 @@ def manhattan_distance_heuristic(state):
 
 
 
-# Utility Functions
+# Utility Functions (Operators)
 
 
 def get_blank_position(state):
@@ -197,6 +197,8 @@ def print_current_state(state):
     pass
 
 
+
+# Global goal state for the 8-puzzle
 goal = [1,2,3,4,5,6,7,8,0]
 
 def main():
@@ -225,11 +227,11 @@ def main():
     alg_choice = input("\nSelect algorithm:\n1. Uniform Cost Search\n2. A* with Misplaced Tile Heuristic\n3. A* with Manhattan Distance Heuristic\nEnter choice (1/2/3): ")
     
     if alg_choice == '1':
-        algorithm = uniform_cost_search
+        uniform_cost_search(initial_state)
     elif alg_choice == '2':
-        algorithm = a_star_misplaced_tile
+        a_star_misplaced_tile(initial_state)
     elif alg_choice == '3':        
-        algorithm = a_star_manhattan_distance
+        a_star_manhattan_distance(initial_state)
     
     pass
 
