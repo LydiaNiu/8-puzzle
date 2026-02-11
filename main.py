@@ -86,25 +86,6 @@ def general_search(initial_state, heuristic_function):
                 heapq.heappush(pq, child) # the heappush function will rearrange the list with priority
         pass
 
-
-# 3 Algorithms
-
-def uniform_cost_search(initial_state):
-    print("Running Uniform Cost Search...")
-    general_search(initial_state, heuristic_function=None)
-
-
-def a_star_misplaced_tile(initial_state):
-    print("Running A* with Misplaced Tile Heuristic...")
-    general_search(initial_state, heuristic_function=misplaced_tile_heuristic)
-
-
-def a_star_manhattan_distance(initial_state):
-    print("Running A* with Manhattan Distance Heuristic...")
-    general_search(initial_state, heuristic_function=manhattan_distance_heuristic)
-
-
-
 #done
 def is_goal(goal, current):
     # This function checks whether the given state matches the goal configuration.
@@ -169,36 +150,46 @@ def manhattan_distance_heuristic(state):
 
 
 # Utility Functions (Operators)
-
-# TODO
+# done
 def get_blank_position(state):
-    return state.index('0') # find the index of the blank tile (0) in the current state
+    return state.index(0) # find the index of the blank tile (0) in the current state
 
-# TODO
-def swap_tiles(state, pos1, pos2):
-    """
-    Swap two positions in the puzzle and return a new state.
-    Uses deepcopy to preserve original state.
-    """
+# done
+def swap_tiles(state, blank_pos, target_pos):
+# Swap two positions in the puzzle and return a new state. Uses deepcopy to preserve original state.
     new_state = copy.deepcopy(state)
-    pass
+    new_state[blank_pos], new_state[target_pos] = new_state[target_pos], new_state[blank_pos]
     return new_state
 
 # Expansion
-# TODO
+# done
 def expand(node):
     """
     Generate all valid child nodes from the given node.
     Uses deepcopy to avoid modifying parent state.
     """
     children = []
-
-    # Example usage of deepcopy (no real move logic)
-    new_state = copy.deepcopy(node.state)
-
-    # Placeholder for move generation
-    pass
-
+    copy_node = copy.deepcopy(node)
+    blank_pos = get_blank_position(copy_node.state) # get the position of the blank tile = 0 in the current state
+    
+    # 4 conditions to check the 4 operators (up, down, left, right)
+    if blank_pos + 3 < 9: # move down
+        # create a new child node with the new state after operation, and add it to the children list
+        child1 = TreeNode(parent = copy_node, state = swap_tiles(copy_node.state, blank_pos, blank_pos + 3),
+                            g_cost = copy_node.g + 1, h_cost = 0) # g(n) increases by 1 for each expansion, h(n) will be calculated later
+        children.append(child1)
+    elif blank_pos - 3 >= 0: # move up
+        child2 = TreeNode(parent = copy_node, state = swap_tiles(copy_node.state, blank_pos, blank_pos - 3),
+                            g_cost = copy_node.g + 1, h_cost = 0)
+        children.append(child2)
+    elif blank_pos % 3 != 0: # move left
+        child3 = TreeNode(parent = copy_node, state = swap_tiles(copy_node.state, blank_pos, blank_pos - 1),
+                            g_cost = copy_node.g + 1, h_cost = 0)
+        children.append(child3)
+    elif blank_pos % 3 != 2: # move right
+        child4 = TreeNode(parent = copy_node, state = swap_tiles(copy_node.state, blank_pos, blank_pos + 1),
+                            g_cost = copy_node.g + 1, h_cost = 0)
+        children.append(child4)
     return children
 
 # TODO
@@ -245,12 +236,14 @@ def main():
     
     alg_choice = input("\nSelect algorithm:\n1. Uniform Cost Search\n2. A* with Misplaced Tile Heuristic\n3. A* with Manhattan Distance Heuristic\nEnter choice (1/2/3): ")
     
+    # 3 Algorithms
     if alg_choice == '1':
-        uniform_cost_search(initial_state)
+        general_search(initial_state, None)
     elif alg_choice == '2':
-        a_star_misplaced_tile(initial_state)
-    elif alg_choice == '3':        
-        a_star_manhattan_distance(initial_state)
+        general_search(initial_state, misplaced_tile_heuristic)
+    elif alg_choice == '3':
+        general_search(initial_state, manhattan_distance_heuristic)
+
     
     # TODO: After the search is complete, reconstruct the path from the goal node 
     # to the root node and print the statistics (number of nodes expanded, depth of solution).
