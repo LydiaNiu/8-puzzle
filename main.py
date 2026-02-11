@@ -101,11 +101,13 @@ def expand(node):
     return children
 
 
-def is_goal(state):
-    """
-    Check whether the given state matches the goal configuration.
-    """
-    pass
+def is_goal(goal, current):
+    # This function checks whether the given state matches the goal configuration.
+    #use a for loop to compare each element of the current state with goal state.
+    for i in range(9):
+        if current[i] != goal[i]:
+            return False
+    return True
 
 
 def board_to_tuple(state):
@@ -119,20 +121,37 @@ def board_to_tuple(state):
 # Heuristic Functions
 
 def misplaced_tile_heuristic(state):
-    """
-    Counts the number of misplaced tiles (excluding blank).
-    """
-    
-    pass
+    # Counts the number of misplaced tiles (excluding blank).
+    misplace_tile = 0
+    for i in range(len(state)): # only check the first 8 tiles, ignore the blank tile (0) from the goal state
+        if state[i] != goal[i]:
+            misplace_tile += 1
+    return misplace_tile
 
+
+def find_man_dist(tile_value, current_pos, distance):
+    # Helper function to calculate Manhattan distance for a single tile.
+    # Calculate the row and column of the current position and goal position.
+    goal_pos = tile_value - 1  # since tile values are 1-8, their goal positions are 0-7
+    current_row, current_col = divmod(current_pos, 3)
+    goal_row, goal_col = divmod(goal_pos, 3)
+    
+    # Calculate Manhattan distance for this tile
+    # The formula is from the youtube video, "Manhattan | Algorithm | Simple Python Tutorial"
+    return abs(current_row - goal_row) + abs(current_col - goal_col) 
 
 def manhattan_distance_heuristic(state):
-    """
-    Computes the sum of Manhattan distances of tiles
-    from their goal positions.
-    """
-    
-    pass
+    # Computes the sum of Manhattan distances of tiles from their goal positions.
+    distance = 0
+    for i in range(len(state)):
+        if state[i] == 0: # ignore the blank tile (0)
+            continue
+        else:
+            # get the position of the tile in the current state and goal state
+            tile_value = state[i]
+            distance += find_man_dist(tile_value, i, distance)
+    return distance
+
 
 
 
@@ -170,6 +189,7 @@ def print_current_state(state):
     pass
 
 
+goal = [1,2,3,4,5,6,7,8,0]
 
 def main():
     puzzle_choice = input("Welcome to the 8-Puzzle Solver! \nPress 1 for provided puzzle, or 2 to enter your own: ")
@@ -185,11 +205,11 @@ def main():
             initial_state = [1,2,3,0,4,5,7,6,8]
         elif difficulty_choice == '3':
             initial_state = [0,1,2,5,3,6,4,7,8]
+            
     elif puzzle_choice == '2':
-        print("Enter your puzzle, using 0 for the blank tile.")
-        for i in range(3):
-            row = input(f"Row {i + 1}: ")
-            initial_state.append(list(map(int, row.split())))
+        print("\nEnter your puzzle, using 0 for the blank tile.")
+        # user input 8 numbers in a single line, separated by comma
+        initial_state = list(map(int, input("Enter the puzzle state (e.g., 1,2,3,4,5,6,7,8,0): ").split(',')))
             
     print_current_state(initial_state)
     
