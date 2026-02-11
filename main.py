@@ -10,28 +10,24 @@ Algorithms:
 import heapq # for priority queue (frontier)
 import copy # for deepcopy of puzzle states
 
-
+# The class TreeNode = tree strucutre for the search algorithms.
+# Each object represents a node/state in the search tree.
+# The nature of the node can store puzzle state, cost values, and parent pointer.
 class TreeNode:
-    """
-    Represents a node in the search tree.
-    Stores puzzle state, cost values, and parent pointer.
-    """
 
+    # This function create new search node and store the g&h cost values
     def __init__(self, parent, state, g_cost, h_cost):
         self.parent = parent # Parent TreeNode
         self.state = state  # Puzzle configuration (2D list)
         self.g = g_cost # Depth cost (g(n))
         self.h = h_cost # Heuristic cost (h(n))
 
+    # This function compute priority value f(n) = g(n) + h(n) for A* search algorithms.
     def f(self):
-        """Total estimated cost f(n) = g(n) + h(n)"""
         return self.g + self.h
 
-    def __lt__(self, other):
-        """
-        Required for heapq.
-        Nodes are compared by f(n).
-        """
+    # This function lets heapq to compare nodes based on their f(n) values.
+    def Compare_cost(self, other):
         return self.f() < other.f()
 
 
@@ -51,6 +47,7 @@ def general_search(initial_state, heuristic_function):
     print("\nInitial State:", start_node.state)
     
     # Push node into heap-based priority queue
+    # The heapq = frontier control 
     heapq.heappush(frontier, start_node)
 
     # Main loop 
