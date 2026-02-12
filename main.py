@@ -23,9 +23,12 @@ class TreeNode:
         self.h = h_cost # Heuristic cost (h(n))
         self.f = f_cost # Total cost (f(n) = g(n) + h(n))
 
+    # def f(self):
+    #     return self.g + self.h # f(n) = g(n) + h(n)
+    
     # less than operator is used by heapq to maintain the priority queue order.
     def __lt__(self, other):
-        return self.f() < other.f()
+        return (self.g + self.h) < (other.g + other.h )
 
 
 def general_search(initial_state, heuristic_function):
@@ -46,7 +49,6 @@ def general_search(initial_state, heuristic_function):
 
     # Create initial node / MAKE_NODE in the pseudocode
     start_node = TreeNode(None, initial_state, 0, 0,0) # The root of the tree, no parents, g and f both =0
-    print("\nInitial State:", start_node.state)
     
     # Push node into heap-based priority queue / MODE_QUEUE in the pseudocode
     # The heapq = frontier control 
@@ -56,8 +58,7 @@ def general_search(initial_state, heuristic_function):
     while pq:
         # Pop thenode with smallest priority value
         current_node = heapq.heappop(pq)
-        print_current_state(current_node.state)
-        visited.add(str(current_node.state)) # add the current node's state to the visited set
+        visited.add(tuple(current_node.state)) # add the current node's state to the visited set
         # might need to make it as str
         
         # Goal test: check if the current node's state is the goal state, if so, return the node
@@ -74,7 +75,7 @@ def general_search(initial_state, heuristic_function):
             children = []
             copy_node = copy.deepcopy(current_node)
             blank_pos = get_blank_position(copy_node.state) # get the position of the blank tile = 0 in the current state
-            
+            print("\nBlank tile is at position:", blank_pos)
             # 2. check the 4 conditions of the 4 operators (up, down, left, right)
             # -> swap tile if the condition meets
             # -> check if the state after swap is already visited before 
@@ -82,37 +83,57 @@ def general_search(initial_state, heuristic_function):
             # -> if not visited, create a new child node with the new state after operation, and add it to the children list
             if blank_pos + 3 < 9: # move down
                 temp_state = swap_tiles(copy_node.state, blank_pos, blank_pos + 3)        
-                if temp_state not in visited:
+                if tuple(temp_state) not in visited:
                     child1 = TreeNode(parent = copy_node, state = swap_tiles(copy_node.state, blank_pos, blank_pos + 3), g_cost = copy_node.g + 1, 
                                       h_cost = heuristic_function(temp_state) if heuristic_function is not None else 0, 
                                       f_cost = copy_node.g + 1 + heuristic_function(temp_state) if heuristic_function is not None else 0) # g(n) increases by 1 for each expansion, h(n) will be calculated later
                     children.append(child1)
-            elif blank_pos - 3 >= 0: # move up
+                    print("\nChild node after moving down:")
+                    print_current_state(temp_state)
+            
+            if blank_pos - 3 >= 0: # move up
+                print("\nTrying to move up...")
                 temp_state = swap_tiles(copy_node.state, blank_pos, blank_pos - 3)
-                if temp_state not in visited:
+                if tuple(temp_state) not in visited:
+                    print("\nMove up is valid, creating child node...")
                     child2 = TreeNode(parent = copy_node, state = swap_tiles(copy_node.state, blank_pos, blank_pos - 3), g_cost = copy_node.g + 1, 
                                       h_cost = heuristic_function(temp_state) if heuristic_function is not None else 0,
                                       f_cost = copy_node.g + 1 + heuristic_function(temp_state) if heuristic_function is not None else 0)
                     children.append(child2)
-            elif blank_pos % 3 != 0: # move left
+                    print("\nChild node after moving up:")
+                    print_current_state(temp_state)
+            
+            if blank_pos % 3 != 0: # move left
+                print("\nTrying to move left...")
                 temp_state = swap_tiles(copy_node.state, blank_pos, blank_pos - 1)
-                if temp_state not in visited:
+                if tuple(temp_state) not in visited:
+                    print("\nMove left is valid, creating child node...")
                     child3 = TreeNode(parent = copy_node, state = swap_tiles(copy_node.state, blank_pos, blank_pos - 1), g_cost = copy_node.g + 1, 
                                       h_cost = heuristic_function(temp_state) if heuristic_function is not None else 0,
                                       f_cost = copy_node.g + 1 + heuristic_function(temp_state) if heuristic_function is not None else 0)
                     children.append(child3)
-            elif blank_pos % 3 != 2: # move right
+                    print("\nChild node after moving left:")
+                    print_current_state(temp_state)
+            
+            if blank_pos % 3 != 2: # move right
+                print("\nTrying to move right...")
                 temp_state = swap_tiles(copy_node.state, blank_pos, blank_pos + 1)
-                if temp_state not in visited:
+                if tuple(temp_state) not in visited:
+                    print("\nMove right is valid, creating child node...")
                     child4 = TreeNode(parent = copy_node, state = swap_tiles(copy_node.state, blank_pos, blank_pos + 1), g_cost = copy_node.g + 1, 
                                       h_cost = heuristic_function(temp_state) if heuristic_function is not None else 0,
                                       f_cost = copy_node.g + 1 + heuristic_function(temp_state) if heuristic_function is not None else 0)
                     children.append(child4)
-                    
+                    print("\nChild node after moving right:")
+                    print_current_state(temp_state)
+
             # 3. append the expanded children of the current node into the priority queue
             for child in children:
                 heapq.heappush(pq, child) # the heappush function will rearrange the list with priority
-        pass
+            
+            # best_child = pq[0] # the child with the smallest f(n) value is at the front of the priority queue
+            # print("\nThe best state to exapnd with a g(n) = ", best_child.g, " and h(n) = ", best_child.h, " is... \n")
+            # print_current_state(best_child.state)
 
 #done
 def is_goal(goal, current):
@@ -151,8 +172,8 @@ def misplaced_tile_heuristic(state):
 
 #done
 def find_man_dist(tile_value, current_pos, distance):
-    # Helper function to calculate Manhattan distance for one single tile.
-    # Calculate the row and column of the current position and goal position.
+    # helper function to calculate Manhattan distance for one single tile.
+    # calculate the row and column of the current position and goal position.
     goal_pos = tile_value - 1  # since tile values are 1-8, their goal positions are 0-7
     current_row, current_col = divmod(current_pos, 3)
     goal_row, goal_col = divmod(goal_pos, 3)
@@ -192,7 +213,6 @@ def swap_tiles(state, blank_pos, target_pos):
 
 #done
 def print_current_state(state):
-    print("\nCurrent State:")
     for i in range(3):
         print(state[i*3:(i+1)*3])
     pass
@@ -226,6 +246,7 @@ def main():
             initial_state = [7,1,2,4,8,5,6,3,0]
         elif difficulty_choice == '8':
             initial_state = [0,7,2,4,6,1,3,5,8]
+        print("\nCurrent State:")
         print_current_state(initial_state)
         
     elif puzzle_choice == '2':
