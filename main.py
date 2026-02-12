@@ -45,7 +45,7 @@ def general_search(initial_state, heuristic_function):
     visited = set() # to keep track of visited states, avoid cycles and redundant expansions
 
     # Create initial node / MAKE_NODE in the pseudocode
-    start_node = TreeNode(None, initial_state, 0, 0) # The root of the tree, no parents, g and f both =0
+    start_node = TreeNode(None, initial_state, 0, 0,0) # The root of the tree, no parents, g and f both =0
     print("\nInitial State:", start_node.state)
     
     # Push node into heap-based priority queue / MODE_QUEUE in the pseudocode
@@ -57,12 +57,12 @@ def general_search(initial_state, heuristic_function):
         # Pop thenode with smallest priority value
         current_node = heapq.heappop(pq)
         print_current_state(current_node.state)
-        visited.add(current_node.state) # add the current node's state to the visited set
+        visited.add(str(current_node.state)) # add the current node's state to the visited set
         # might need to make it as str
         
         # Goal test: check if the current node's state is the goal state, if so, return the node
         if is_goal(goal, current_node.state):
-            print("Goal state reached!\n\n")
+            print("\nGoal state reached!\n\n")
             print("Solution found at depth:", current_node.g)
             print("Number of nodes expanded:", len(visited)) # nodes expanded: len(visited)
             print("Max queue size:", len(pq) + len(visited)) # max queue : len(heap) + len(visited)
@@ -203,7 +203,7 @@ def print_current_state(state):
 goal = [1,2,3,4,5,6,7,8,0]
 
 def main():
-    puzzle_choice = input("Welcome to the 8-Puzzle Solver! \n\nPress 1 for provided puzzle, or 2 to enter your own: \n\n")
+    puzzle_choice = input("Welcome to the 8-Puzzle Solver! \n\nPress 1 for provided puzzle, or 2 to enter your own: ")
     initial_state = []
     
     if puzzle_choice == '1':
@@ -237,7 +237,7 @@ def main():
     for i in range(3):
         print(goal[i*3:(i+1)*3])
     
-    alg_choice = input("\nSelect algorithm:\n\n1. Uniform Cost Search\n2. A* with Misplaced Tile Heuristic\n3. A* with Manhattan Distance Heuristic\n\nEnter choice (1/2/3): \n\n")
+    alg_choice = input("\nSelect algorithm:\n\n1. Uniform Cost Search\n2. A* with Misplaced Tile Heuristic\n3. A* with Manhattan Distance Heuristic\n\nEnter choice (1/2/3): ")
     
     # 3 Algorithms
     if alg_choice == '1':
