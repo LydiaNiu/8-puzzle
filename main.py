@@ -23,9 +23,6 @@ class TreeNode:
         self.h = h_cost # Heuristic cost (h(n))
         self.f = f_cost # Total cost (f(n) = g(n) + h(n))
 
-    # def f(self):
-    #     return self.g + self.h # f(n) = g(n) + h(n)
-    
     # less than operator is used by heapq to maintain the priority queue order.
     def __lt__(self, other):
         return (self.g + self.h) < (other.g + other.h )
@@ -75,7 +72,7 @@ def general_search(initial_state, heuristic_function):
             children = []
             copy_node = copy.deepcopy(current_node)
             blank_pos = get_blank_position(copy_node.state) # get the position of the blank tile = 0 in the current state
-            print("\nBlank tile is at position:", blank_pos)
+            
             # 2. check the 4 conditions of the 4 operators (up, down, left, right)
             # -> swap tile if the condition meets
             # -> check if the state after swap is already visited before 
@@ -88,54 +85,39 @@ def general_search(initial_state, heuristic_function):
                                       h_cost = heuristic_function(temp_state) if heuristic_function is not None else 0, 
                                       f_cost = copy_node.g + 1 + heuristic_function(temp_state) if heuristic_function is not None else 0) # g(n) increases by 1 for each expansion, h(n) will be calculated later
                     children.append(child1)
-                    print("\nChild node after moving down:")
-                    print_current_state(temp_state)
             
             if blank_pos - 3 >= 0: # move up
-                print("\nTrying to move up...")
                 temp_state = swap_tiles(copy_node.state, blank_pos, blank_pos - 3)
                 if tuple(temp_state) not in visited:
-                    print("\nMove up is valid, creating child node...")
                     child2 = TreeNode(parent = copy_node, state = swap_tiles(copy_node.state, blank_pos, blank_pos - 3), g_cost = copy_node.g + 1, 
                                       h_cost = heuristic_function(temp_state) if heuristic_function is not None else 0,
                                       f_cost = copy_node.g + 1 + heuristic_function(temp_state) if heuristic_function is not None else 0)
                     children.append(child2)
-                    print("\nChild node after moving up:")
-                    print_current_state(temp_state)
             
             if blank_pos % 3 != 0: # move left
-                print("\nTrying to move left...")
                 temp_state = swap_tiles(copy_node.state, blank_pos, blank_pos - 1)
                 if tuple(temp_state) not in visited:
-                    print("\nMove left is valid, creating child node...")
                     child3 = TreeNode(parent = copy_node, state = swap_tiles(copy_node.state, blank_pos, blank_pos - 1), g_cost = copy_node.g + 1, 
                                       h_cost = heuristic_function(temp_state) if heuristic_function is not None else 0,
                                       f_cost = copy_node.g + 1 + heuristic_function(temp_state) if heuristic_function is not None else 0)
                     children.append(child3)
-                    print("\nChild node after moving left:")
-                    print_current_state(temp_state)
             
             if blank_pos % 3 != 2: # move right
-                print("\nTrying to move right...")
                 temp_state = swap_tiles(copy_node.state, blank_pos, blank_pos + 1)
                 if tuple(temp_state) not in visited:
-                    print("\nMove right is valid, creating child node...")
                     child4 = TreeNode(parent = copy_node, state = swap_tiles(copy_node.state, blank_pos, blank_pos + 1), g_cost = copy_node.g + 1, 
                                       h_cost = heuristic_function(temp_state) if heuristic_function is not None else 0,
                                       f_cost = copy_node.g + 1 + heuristic_function(temp_state) if heuristic_function is not None else 0)
                     children.append(child4)
-                    print("\nChild node after moving right:")
-                    print_current_state(temp_state)
 
             # 3. append the expanded children of the current node into the priority queue
             for child in children:
                 heapq.heappush(pq, child) # the heappush function will rearrange the list with priority
             
-            # best_child = pq[0] # the child with the smallest f(n) value is at the front of the priority queue
-            # print("\nThe best state to exapnd with a g(n) = ", best_child.g, " and h(n) = ", best_child.h, " is... \n")
-            # print_current_state(best_child.state)
+            best_child = pq[0] # the child with the smallest f(n) value is at the front of the priority queue
+            print("\nThe best state to exapnd with a g(n) = ", best_child.g, " and h(n) = ", best_child.h, " is... \n")
+            print_current_state(best_child.state)
 
-#done
 def is_goal(goal, current):
     # This function checks whether the given state matches the goal configuration.
     #use a for loop to compare each element of the current state with goal state.
@@ -145,33 +127,31 @@ def is_goal(goal, current):
     return True
 
 
-# def to_tuple(node):
-#     # Convert a node into a tuple for hashing.
-#     return tuple(node.f(node), node.state)
-
-
 # Heuristic Functions
 '''
-following are the heuristic functions for the A* search algorithms. 
+Following are the 2 different heuristic functions for the A* search algorithms. 
 
-The first one counts the number of misplaced tiles. 
-The second one calculates the sum of Manhattan distances of the tiles from their goal positions.
+1. Misplaced tiles simply counts the number of tiles that are not in their goal positions. 
+2. Manhattan distance calculates the sum of Manhattan distances of the tiles from their goal positions.
 
 Both functions ignore the blank tile (0) when calculating their respective heuristics.
-Both functions return the heuristic value, which is used in the A* search to estimate the cost to reach the goal state from the current state.
+Both functions return the heuristic value, which is used in the A* search to estimate the cost 
+to reach the goal state from the current state.
+Functions are being taken in as the paramter of the general_search function
+Functions are used when creating the child nodes in the exapansion step to calculate the h(n)
 '''
 
-#done
+
 def misplaced_tile_heuristic(state):
     # Counts the number of misplaced tiles (excluding blank).
     misplace_tile = 0
-    for i in range(len(state)): # only check the first 8 tiles, ignore the blank tile (0) from the goal state
+    # a for loop to compare each tile in the current state with the corresponding tile in the goal state
+    for i in range(len(state)): 
         if state[i] != goal[i]:
             misplace_tile += 1
     return misplace_tile
 
-#done
-def find_man_dist(tile_value, current_pos, distance):
+def find_man_dist(tile_value, current_pos):
     # helper function to calculate Manhattan distance for one single tile.
     # calculate the row and column of the current position and goal position.
     goal_pos = tile_value - 1  # since tile values are 1-8, their goal positions are 0-7
@@ -182,7 +162,6 @@ def find_man_dist(tile_value, current_pos, distance):
     # The formula is from the youtube video, "Manhattan | Algorithm | Simple Python Tutorial"
     return abs(current_row - goal_row) + abs(current_col - goal_col) 
 
-#done
 def manhattan_distance_heuristic(state):
     # Computes the sum of Manhattan distances of tiles from their goal positions.
     distance = 0
@@ -190,28 +169,24 @@ def manhattan_distance_heuristic(state):
         if state[i] == 0: # ignore the blank tile (0)
             continue
         else:
-            # get the position of the tile in the current state and goal state
+            # call the calcualting function: find_man_dist for each tile and sum up the total distance
             tile_value = state[i]
-            distance += find_man_dist(tile_value, i, distance)
+            distance += find_man_dist(tile_value, i)
     return distance
 
 
 
 
 # Utility Functions (Operators)
-# done
 def get_blank_position(state):
     return state.index(0) # find the index of the blank tile (0) in the current state
 
-# done
 def swap_tiles(state, blank_pos, target_pos):
-# Swap two positions in the puzzle and return a new state. Uses deepcopy to preserve original state.
+    # Swap two positions in the puzzle and return a new state. Uses deepcopy to preserve original state.
     new_state = copy.deepcopy(state)
     new_state[blank_pos], new_state[target_pos] = new_state[target_pos], new_state[blank_pos]
     return new_state
 
-
-#done
 def print_current_state(state):
     for i in range(3):
         print(state[i*3:(i+1)*3])
