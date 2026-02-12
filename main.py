@@ -203,20 +203,29 @@ def print_current_state(state):
 goal = [1,2,3,4,5,6,7,8,0]
 
 def main():
-    puzzle_choice = input("Welcome to the 8-Puzzle Solver! \nPress 1 for provided puzzle, or 2 to enter your own: ")
+    puzzle_choice = input("Welcome to the 8-Puzzle Solver! \n\nPress 1 for provided puzzle, or 2 to enter your own: \n\n")
     initial_state = []
     
     if puzzle_choice == '1':
-        print("\nPlease select the difficulty level:")
-        print("1. Easy\n2. Medium\n3. Hard")
-        difficulty_choice = input("Enter choice (1/2/3): ")
+        print("\nPlease select the difficulty level ( 1 - 8 ):")
+        difficulty_choice = input("Enter choice (1/2/3/4/5/6/7/8): ")
         
         if difficulty_choice == '1':
-            initial_state = [1,2,3,4,5,6,0,7,8]
+            initial_state = [1,2,3,4,5,6,7,8,0]
         elif difficulty_choice == '2':
-            initial_state = [1,2,3,0,4,5,7,6,8]
+            initial_state = [1,2,3,4,5,6,0,7,8]
         elif difficulty_choice == '3':
-            initial_state = [0,1,2,5,3,6,4,7,8]
+            initial_state = [1,2,3,5,0,6,4,7,8]
+        elif difficulty_choice == '4':
+            initial_state = [1,3,6,5,0,2,4,7,8]
+        elif difficulty_choice == '5':
+            initial_state = [1,3,6,5,0,7,4,8,2]
+        elif difficulty_choice == '6':
+            initial_state = [1,6,7,5,0,3,4,8,2]
+        elif difficulty_choice == '7':
+            initial_state = [7,1,2,4,8,5,6,3,0]
+        elif difficulty_choice == '8':
+            initial_state = [0,7,2,4,6,1,3,5,8]
         print_current_state(initial_state)
         
     elif puzzle_choice == '2':
@@ -224,9 +233,11 @@ def main():
         # user input 8 numbers in a single line, separated by comma
         initial_state = list(map(int, input("Enter the puzzle state (e.g., 1,2,3,4,5,6,7,8,0): ").split(',')))
             
-    print_current_state(initial_state)
+    print("\nGoal State:")
+    for i in range(3):
+        print(goal[i*3:(i+1)*3])
     
-    alg_choice = input("\nSelect algorithm:\n1. Uniform Cost Search\n2. A* with Misplaced Tile Heuristic\n3. A* with Manhattan Distance Heuristic\nEnter choice (1/2/3): ")
+    alg_choice = input("\nSelect algorithm:\n\n1. Uniform Cost Search\n2. A* with Misplaced Tile Heuristic\n3. A* with Manhattan Distance Heuristic\n\nEnter choice (1/2/3): \n\n")
     
     # 3 Algorithms
     if alg_choice == '1':
@@ -235,10 +246,6 @@ def main():
         general_search(initial_state, misplaced_tile_heuristic)
     elif alg_choice == '3':
         general_search(initial_state, manhattan_distance_heuristic)
-
-    
-    # TODO: After the search is complete, reconstruct the path from the goal node 
-    # to the root node and print the statistics (number of nodes expanded, depth of solution).
     pass
 
 
