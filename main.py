@@ -1,12 +1,3 @@
-"""
-8-Puzzle Solver – Skeleton Structure
-Algorithms:
-1. Uniform Cost Search
-2. A* with Misplaced Tile Heuristic
-3. A* with Manhattan Distance Heuristic
-
-"""
-
 import heapq # for priority queue (frontier)
 import copy # for deepcopy of puzzle states
 
