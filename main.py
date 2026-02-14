@@ -37,7 +37,6 @@ def general_search(initial_state, heuristic_function):
     Note: Uniform cost search has no heuristic function, the paramenter passses in 'None', h(n) = 0
     """
     
-    print("\nStarting General Search...")
     # The following codes are from the pseudocode of general search provided in project description
     
     # Priority queue (frontier)
@@ -115,7 +114,7 @@ def general_search(initial_state, heuristic_function):
                 heapq.heappush(pq, child) # the heappush function will rearrange the list with priority
             
             best_child = pq[0] # the child with the smallest f(n) value is at the front of the priority queue
-            print("\nThe best state to exapnd with a g(n) = ", best_child.g, " and h(n) = ", best_child.h, " is... \n")
+            print("\nThe best state to expand with a g(n) = ", best_child.g, " and h(n) = ", best_child.h, " is... \n")
             print_current_state(best_child.state)
 
 def is_goal(goal, current):
@@ -192,6 +191,32 @@ def print_current_state(state):
         print(state[i*3:(i+1)*3])
     pass
 
+# Solvability Check
+'''
+When testing user inputed puzzle, the program first check if the puzzle is solvable
+If not, the program will print a message and exit.
+Doing so, the function checks if the number of inversions is even or odd. 
+
+For 3x3 puzzle, if the number of inversions is even, the puzzle is solvable; if odd, it is not solvable.
+Inversion: the front tile is higher than back tile
+
+ex: 
+[1, 2, 3, 4, 5, 6, 8, 7] inversion = 1 (8 is higher than 7) -> non solvable
+[2, 1, 3, 4, 5, 6, 8 ,7] inversion = 2 (2 is higher than 1, 8 is higher than 7) -> solvable
+'''
+def is_solvable(state):
+    inversions = 0
+    # Create a list without the blank tile to simplify logic
+    # or simply skip '0' inside the loop
+    for i in range(len(state)):
+        if state[i] == 0: continue  # Skip the blank tile
+        for j in range(i + 1, len(state)):
+            if state[j] == 0: continue  # Skip the blank tile
+            if state[i] > state[j]:
+                inversions += 1
+
+    # For 3x3 puzzle, solvable if inversions is even
+    return inversions % 2 == 0
 
 
 # Global goal state for the 8-puzzle
@@ -225,9 +250,12 @@ def main():
         print_current_state(initial_state)
         
     elif puzzle_choice == '2':
-        print("\nEnter your puzzle, using 0 for the blank tile.")
         # user input 8 numbers in a single line, separated by comma
-        initial_state = list(map(int, input("Enter the puzzle state (e.g., 1,2,3,4,5,6,7,8,0): ").split(',')))
+        initial_state = list(map(int, input("\nEnter your puzzle, using 0 for the blank tile and comma as split.\n\nExample: 1,5,6,2,3,4,7,8,0\n\n").split(',')))
+        if not is_solvable(initial_state):
+            print("\nThis input puzzle is not solvable, it cannot meet the goal state.")
+            return
+
             
     print("\nGoal State:")
     for i in range(3):
